@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXTAUTH_URL: https://YOUR-DOMAIN.com
+      NEXTAUTH_SECRET: changeme-super-secret-key
+      DATABASE_URL: "file:./prisma/dev.db"
+      ZORAXY_API_URL: https://zoraxy
+      ZORAXY_USERNAME: admin
+      ZORAXY_PASSWORD: admin
+      TOTP_ISSUER: LoginFirewall
+      PASSKEY_ORIGIN: https://YOUR-DOMAIN.com
+      PASSKEY_RP_ID: localhost
+      PASSKEY_RP_NAME: LoginFirewall
+    volumes:
+      - app-data:/app/prisma
+    command: sh -c "npx prisma migrate deploy && npm run start"
+
+volumes:
+  app-data:

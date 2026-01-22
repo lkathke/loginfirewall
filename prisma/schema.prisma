@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  username    String   @unique
+  displayName String?
+  password    String
+  role        String   @default("USER") // "ADMIN" or "USER"
+  totpSecret  String?
+  totpEnabled Boolean  @default(false)
+  passkeyChallenge String?
+  passkeyChallengeExpires DateTime?
+  createdAt   DateTime @default(now())
+
+  groups         UserGroup[]
+  whitelistedIPs WhitelistedIP[]
+  passkeys       Passkey[]
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  name        String
+  whitelistId String?  // Zoraxy GUID (optional)
+  createdAt   DateTime @default(now())
+
+  users UserGroup[]
+  links Link[]
+}
+
+model UserGroup {
+  userId  String
+  groupId String
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+}
+
+model Link {
+  id      String @id @default(uuid())
+  title   String
+  url     String
+  icon    String // Lucide icon name
+  groupId String
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model WhitelistedIP {
+  id          String   @id @default(uuid())
+  ip          String
+  userId      String
+  whitelistId String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Passkey {
+  id                String   @id @default(uuid())
+  userId            String
+  name              String?
+  credentialId      String   @unique
+  publicKey         Bytes
+  counter           Int      @default(0)
+  transports        String?
+  deviceType        String?
+  backedUp          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
