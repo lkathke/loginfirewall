@@ -57,8 +57,7 @@ docker run -d \
   -e PASSKEY_RP_ID=localhost \
   -e PASSKEY_RP_NAME=LoginFirewall \
   -v loginfirewall-data:/app/prisma \
-  lassekathke/loginfirewall:latest \
-  sh -c "npx prisma migrate deploy && npm run start"
+  lassekathke/loginfirewall:latest
 ```
 
 ### Docker Compose (App Only)
@@ -85,7 +84,6 @@ services:
       PASSKEY_RP_NAME: LoginFirewall
     volumes:
       - app-data:/app/prisma
-    command: sh -c "npx prisma migrate deploy && npm run start"
 
 volumes:
   app-data:
@@ -115,7 +113,6 @@ services:
       PASSKEY_RP_NAME: LoginFirewall
     volumes:
       - app-data:/app/prisma
-    command: sh -c "npx prisma migrate deploy && npm run start"
     depends_on:
       - zoraxy
 
